@@ -13118,7 +13118,7 @@
 		"@microsoft/fast-react-wrapper": "0.3.16-0",
 		"@octokit/core": "4.2.0",
 		"@opentelemetry/api": "1.4.0",
-		"@opentelemetry/exporter-trace-otlp-http": "0.35.1",
+		"@opentelemetry/exporter-trace-otlp-http": "0.39.1",
 		"@opentelemetry/sdk-trace-base": "1.9.1",
 		"@vscode/codicons": "0.0.32",
 		"@vscode/webview-ui-toolkit": "1.2.1",
