@@ -478,7 +478,7 @@ export class GraphWebviewProvider implements WebviewProvider<State, State, Graph
 	registerCommands(): Disposable[] {
 		const commands: Disposable[] = [];
 
-		if (this.host.isHost('view')) {
+		if (this.host.is('view')) {
 			commands.push(
 				registerCommand(`${this.host.id}.refresh`, () => this.host.refresh(true)),
 				registerCommand(
@@ -685,6 +685,7 @@ export class GraphWebviewProvider implements WebviewProvider<State, State, Graph
 				this.copyWorkingChangesToWorktree,
 			),
 			this.host.registerWebviewCommand('gitlens.graph.ai.generateCommitMessage', this.generateCommitMessage),
+			this.host.registerWebviewCommand('gitlens.graph.ai.explainBranch', this.explainBranch),
 			this.host.registerWebviewCommand('gitlens.graph.ai.explainCommit', this.explainCommit),
 			this.host.registerWebviewCommand('gitlens.graph.ai.explainStash', this.explainStash),
 			this.host.registerWebviewCommand('gitlens.graph.ai.explainWip', this.explainWip),
@@ -1075,7 +1076,7 @@ export class GraphWebviewProvider implements WebviewProvider<State, State, Graph
 					},
 				);
 
-				const details = this.host.isHost('editor')
+				const details = this.host.is('editor')
 					? this.container.views.commitDetails
 					: this.container.views.graphDetails;
 				if (!details.ready) {
@@ -1711,7 +1712,7 @@ export class GraphWebviewProvider implements WebviewProvider<State, State, Graph
 		this._selection = commits;
 
 		if (commits == null) return;
-		if (!this._firstSelection && this.host.isHost('editor') && !this.host.active) return;
+		if (!this._firstSelection && this.host.is('editor') && !this.host.active) return;
 
 		this.container.events.fire(
 			'commit:selected',
@@ -3352,7 +3353,7 @@ export class GraphWebviewProvider implements WebviewProvider<State, State, Graph
 		const ref = this.getGraphItemRef(item, 'revision');
 		if (ref == null) return Promise.resolve();
 
-		if (this.host.isHost('view')) {
+		if (this.host.is('view')) {
 			return void showGraphDetailsView(ref, { preserveFocus: true, preserveVisibility: false });
 		}
 
@@ -3885,6 +3886,17 @@ export class GraphWebviewProvider implements WebviewProvider<State, State, Graph
 		});
 	}
 
+	@log()
+	private explainBranch(item?: GraphItemContext) {
+		const ref = this.getGraphItemRef(item, 'branch');
+		if (ref == null) return Promise.resolve();
+
+		return executeCommand('gitlens.ai.explainBranch', {
+			repoPath: ref.repoPath,
+			ref: ref.ref,
+			source: { source: 'graph', type: 'branch' },
+		});
+	}
 	@log()
 	private explainCommit(item?: GraphItemContext) {
 		const ref = this.getGraphItemRef(item, 'revision');

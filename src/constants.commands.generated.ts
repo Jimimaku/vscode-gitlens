@@ -23,6 +23,7 @@ export type ContributedCommands =
 	| 'gitlens.copyRemoteRepositoryUrl'
 	| 'gitlens.ghpr.views.openOrCreateWorktree'
 	| 'gitlens.graph.addAuthor'
+	| 'gitlens.graph.ai.explainBranch'
 	| 'gitlens.graph.ai.explainCommit'
 	| 'gitlens.graph.ai.explainStash'
 	| 'gitlens.graph.ai.explainWip'
@@ -614,6 +615,7 @@ export type ContributedCommands =
 
 export type ContributedPaletteCommands =
 	| 'gitlens.addAuthors'
+	| 'gitlens.ai.explainBranch'
 	| 'gitlens.ai.explainCommit'
 	| 'gitlens.ai.explainStash'
 	| 'gitlens.ai.explainWip'

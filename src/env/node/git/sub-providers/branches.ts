@@ -39,9 +39,8 @@ import { normalizePath } from '../../../../system/path';
 import { getSettledValue } from '../../../../system/promise';
 import { maybeStopWatch } from '../../../../system/stopwatch';
 import type { Git } from '../git';
-import { GitErrors, gitLogDefaultConfigs } from '../git';
+import { GitError, GitErrors, gitLogDefaultConfigs } from '../git';
 import type { LocalGitProvider } from '../localGitProvider';
-import { RunError } from '../shell.errors';
 
 const emptyPagedResult: PagedResult<any> = Object.freeze({ values: [] });
 
@@ -612,7 +611,7 @@ export class BranchesGitSubProvider implements GitBranchesSubProvider {
 						scope,
 						`Unable to merge '${branch}' and '${targetBranch}' as they have no common ancestor`,
 					);
-				} else if (ex instanceof RunError) {
+				} else if (ex instanceof GitError) {
 					data = ex.stdout;
 				} else {
 					Logger.error(ex, scope);
@@ -705,6 +704,21 @@ export class BranchesGitSubProvider implements GitBranchesSubProvider {
 	async setUserMergeTargetBranchName(repoPath: string, ref: string, target: string | undefined): Promise<void> {
 		const mergeTargetConfigKey: GitConfigKeys = `branch.${ref}.gk-user-merge-target`;
 		await this.provider.config.setConfig(repoPath, mergeTargetConfigKey, target);
+	}
+
+	async getMergeTargetBranchName(repoPath: string, branch: GitBranch): Promise<string | undefined> {
+		const [baseResult, defaultResult, targetResult, userTargetResult] = await Promise.allSettled([
+			this.getBaseBranchName?.(repoPath, branch.name),
+			this.getDefaultBranchName(repoPath, branch.getRemoteName()),
+			this.getTargetBranchName?.(repoPath, branch.name),
+			this.getUserMergeTargetBranchName?.(repoPath, branch.name),
+		]);
+
+		const baseBranchName = getSettledValue(baseResult);
+		const defaultBranchName = getSettledValue(defaultResult);
+		const targetMaybeResult = getSettledValue(targetResult);
+		const userTargetBranchName = getSettledValue(userTargetResult);
+		return userTargetBranchName || targetMaybeResult || baseBranchName || defaultBranchName;
 	}
 
 	private async getBaseBranchFromReflog(

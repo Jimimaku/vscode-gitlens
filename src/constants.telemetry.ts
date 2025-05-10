@@ -336,7 +336,7 @@ interface AIEventDataBase {
 
 interface AIExplainEvent extends AIEventDataBase {
 	type: 'change';
-	changeType: 'wip' | 'stash' | 'commit' | `draft-${'patch' | 'stash' | 'suggested_pr_change'}`;
+	changeType: 'wip' | 'stash' | 'commit' | 'branch' | `draft-${'patch' | 'stash' | 'suggested_pr_change'}`;
 }
 
 export interface AIGenerateCommitEventData extends AIEventDataBase {
@@ -902,6 +902,10 @@ interface WalkthroughEvent {
 }
 
 type WalkthroughActionNames =
+	| 'open/ai-custom-instructions-settings'
+	| 'open/ai-enable-setting'
+	| 'open/ai-settings'
+	| 'open/help-center/ai-features'
 	| 'open/help-center/start-integrations'
 	| 'open/help-center/accelerate-pr-reviews'
 	| 'open/help-center/streamline-collaboration'
@@ -921,11 +925,12 @@ type WalkthroughActionNames =
 	| 'plus/upgrade'
 	| 'plus/reactivate'
 	| 'open/walkthrough'
-	| 'open/inspect';
+	| 'open/inspect'
+	| 'switch/ai-model';
 
 type WalkthroughActionEvent =
-	| { type: 'command'; name: WalkthroughActionNames; command: string }
-	| { type: 'url'; name: WalkthroughActionNames; url: string };
+	| { type: 'command'; name: WalkthroughActionNames; command: string; detail?: string }
+	| { type: 'url'; name: WalkthroughActionNames; url: string; detail?: string };
 
 interface WalkthroughCompletionEvent {
 	'context.key': WalkthroughContextKeys;
